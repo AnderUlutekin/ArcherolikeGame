@@ -8,8 +8,9 @@ using ETouch = UnityEngine.InputSystem.EnhancedTouch;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private Vector2 joystickSize = new Vector2(200, 200);
-    private Joystick joystick;
+    private Vector2 joystickSize = new Vector2(100, 100);
+    [SerializeField]
+    private GameObject joystick;
 
     private CharacterController controller;
     private Animator animator;
@@ -26,7 +27,26 @@ public class PlayerMovement : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-        joystick = FindObjectOfType<Joystick>();
+        //joystick = FindObjectOfType<Joystick>();
+    }
+
+    private void Update()
+    {
+        Vector3 direction = new Vector3(movementAmount.x, 0f, movementAmount.y).normalized;
+
+        if (direction.magnitude >= 0.1f)
+        {
+            animator.SetBool("isMoving", true);
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+            controller.Move(direction * speed * Time.deltaTime);
+        }
+        else
+        {
+            animator.SetBool("isMoving", false);
+        }
     }
 
     private void OnEnable()
@@ -55,19 +75,19 @@ public class PlayerMovement : MonoBehaviour
 
             if (Vector2.Distance(
                 currentTouch.screenPosition, 
-                joystick.rectTransform.anchoredPosition
+                joystick.GetComponent<Joystick>().rectTransform.anchoredPosition
                 ) > maxMovement)
             {
                 knobPos = (
-                    currentTouch.screenPosition - joystick.rectTransform.anchoredPosition
+                    currentTouch.screenPosition - joystick.GetComponent<Joystick>().rectTransform.anchoredPosition
                     ).normalized * maxMovement;
             }
             else
             {
-                knobPos = currentTouch.screenPosition - joystick.rectTransform.anchoredPosition;
+                knobPos = currentTouch.screenPosition - joystick.GetComponent<Joystick>().rectTransform.anchoredPosition;
             }
 
-            joystick.knob.anchoredPosition = knobPos;
+            joystick.GetComponent<Joystick>().knob.anchoredPosition = knobPos;
             movementAmount = knobPos / maxMovement;
         }
     }
@@ -77,7 +97,7 @@ public class PlayerMovement : MonoBehaviour
         if (lostFinger == movementFinger)
         {
             movementFinger = null;
-            joystick.knob.anchoredPosition = Vector2.zero;
+            joystick.GetComponent<Joystick>().knob.anchoredPosition = Vector2.zero;
             joystick.gameObject.SetActive(false);
             movementAmount = Vector2.zero;
         }
@@ -90,14 +110,14 @@ public class PlayerMovement : MonoBehaviour
             movementFinger = touchedFinger;
             movementAmount = Vector2.zero;
             joystick.gameObject.SetActive(true);
-            joystick.rectTransform.sizeDelta = joystickSize;
-            joystick.rectTransform.anchoredPosition = ClampStartPosition(touchedFinger.screenPosition);
+            joystick.GetComponent<Joystick>().rectTransform.sizeDelta = joystickSize;
+            joystick.GetComponent<Joystick>().rectTransform.anchoredPosition = ClampStartPosition(touchedFinger.screenPosition);
         }
     }
 
     private Vector2 ClampStartPosition(Vector2 startPosition)
     {
-        if (startPosition.x < joystickSize.x)
+        if (startPosition.x < joystickSize.x / 2)
         {
             startPosition.x = joystickSize.x / 2;
         }
@@ -106,7 +126,7 @@ public class PlayerMovement : MonoBehaviour
             startPosition.x = Screen.width - joystickSize.x / 2;
         }
 
-        if (startPosition.y < joystickSize.y)
+        if (startPosition.y < joystickSize.y / 2)
         {
             startPosition.y = joystickSize.y / 2;
         }
@@ -116,28 +136,5 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return startPosition;
-    }
-
-    private void Update()
-    {
-        Vector3 scaledMovement = speed * Time.deltaTime * new Vector3(
-            movementAmount.x, 
-            0, 
-            movementAmount.y
-            );
-
-        if (scaledMovement.magnitude >= 0.1f)
-        {
-            animator.SetBool("isMoving", true);
-            float targetAngle = Mathf.Atan2(scaledMovement.x, scaledMovement.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-            controller.Move(scaledMovement);
-        }
-        else
-        {
-            animator.SetBool("isMoving", false);
-        }
     }
 }

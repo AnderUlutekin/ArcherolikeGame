@@ -568,7 +568,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d56b9517536be394b8cc5049f6953b71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joystickSize: {x: 200, y: 200}
+  joystick: {fileID: 0}
+  speed: 6
+  turnSmoothTime: 0.1
 --- !u!1 &1587010040157272606
 GameObject:
   m_ObjectHideFlags: 0
