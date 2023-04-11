@@ -9,7 +9,7 @@ using ETouch = UnityEngine.InputSystem.EnhancedTouch;
 public class PlayerMovement : MonoBehaviour
 {
     private Vector2 joystickSize = new Vector2(100, 100);
-    [SerializeField]
+    //[SerializeField]
     private GameObject joystick;
 
     private CharacterController controller;
@@ -23,11 +23,11 @@ public class PlayerMovement : MonoBehaviour
 
     private float turnSmoothVelocity;
 
-    private void Start()
+    private void Awake()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-        //joystick = FindObjectOfType<Joystick>();
+        joystick = GameObject.FindWithTag("Joystick");
     }
 
     private void Update()

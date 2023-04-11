@@ -8,8 +8,9 @@ public class Joystick : MonoBehaviour
     public RectTransform rectTransform;
     public RectTransform knob;
 
-    private void Awake()
+    private void Start()
     {
         rectTransform = GetComponent<RectTransform>();
+        gameObject.SetActive(false);
     }
 }

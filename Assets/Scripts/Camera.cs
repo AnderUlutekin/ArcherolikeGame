@@ -19,8 +19,20 @@ public class Camera : MonoBehaviour
     {
         Vector3 desiredPos = target.position + offset;
         Vector3 smoothedPos = Vector3.Lerp(transform.position, desiredPos, smoothSpeed);
-        transform.position = smoothedPos;
+        if (smoothedPos.z < -37)
+        {
+            smoothedPos.z = -37;
+        }
+        else if (smoothedPos.z > -30)
+        {
+            smoothedPos.z = -30;
+        }
 
-        //transform.LookAt(target);
+        if (smoothedPos.y != 23)
+        {
+            smoothedPos.y = 23;
+        }
+        smoothedPos.x = 0;
+        transform.position = smoothedPos;
     }
 }
